@@ -1,7 +1,4 @@
-app.controller("indexController", [
-  "$scope",
-  "indexFactory",
-  ($scope, indexFactory) => {
+app.controller("indexController", [ '$scope','indexFactory', 'configFactory',($scope,indexFactory, configFactory)  => {
     // Assosiy proyektimizdagi kodlarni shu yerda yozamiz
     // bu yerda Client tarafindan ko'rinadigan qismi
 
@@ -18,20 +15,22 @@ app.controller("indexController", [
     };
 
     function scrollTop() {
-        setTimeout(() => {
-            const elee = document.querySelector("#chat-area");
-            elee.scrollTop = elee.scrollHeight;
-        }, 1000)
+      setTimeout(() => {
+        const elee = document.querySelector("#chat-area");
+        elee.scrollTop = elee.scrollHeight;
+      }, 1000);
     }
 
-    function initScoket(username) {
+   async function initScoket(username) {
       const connectionOptions = {
         reconnectionAttempts: 3,
         reconnectionDelay: 600,
       };
 
+      const socketUrl = await configFactory.getConfig()
+      // console.log(socketUrl.data.socketUrl);
       indexFactory
-        .connectSocket("http://localhost:3000", connectionOptions)
+        .connectSocket(socketUrl.data.socketUrl, connectionOptions)
         .then((socket) => {
           socket.emit("newUser", { username });
 
@@ -52,7 +51,7 @@ app.controller("indexController", [
             $scope.messages.push(messageData); // clinyetga yuboramiz
             $scope.players[data.id] = data;
             // console.log($scope.players[data.id]);
-            scrollTop()
+            scrollTop();
             $scope.$apply();
           });
 
@@ -68,7 +67,7 @@ app.controller("indexController", [
 
             $scope.messages.push(messageData); // clinyetga yuboramiz
             delete $scope.players[user.id];
-            scrollTop()
+            scrollTop();
             $scope.$apply();
           });
 
@@ -85,7 +84,7 @@ app.controller("indexController", [
           //================      message qarshilimiz serverdan kelgan message    ============================
           socket.on("newMessage", (message) => {
             $scope.messages.push(message); // bizning yozgan hatlarimiz
-            scrollTop()
+            scrollTop();
             $scope.$apply();
             // scrollTop();
           });
@@ -122,10 +121,8 @@ app.controller("indexController", [
             $scope.message = "";
 
             socket.emit("newMessage", messageData);
-            scrollTop()
-            
+            scrollTop();
           };
-          
         })
         .catch((err) => {
           console.log(err);

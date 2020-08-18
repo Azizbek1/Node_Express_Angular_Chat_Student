@@ -1,0 +1,1 @@
+const app = angular.module('app', []); // Bu app bizda hamma sahifada angular funcsiyasi ishlatishimiz uchun belgilanadi biz uni layout qismida belgilimiz
